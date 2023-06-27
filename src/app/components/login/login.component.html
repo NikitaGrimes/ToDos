@@ -40,4 +40,5 @@
         >
         LogIn
     </button>
+    <mat-error *ngIf="(authorize$ | async) === true">{{getInputErrorMessage()}}</mat-error>
 </form>
