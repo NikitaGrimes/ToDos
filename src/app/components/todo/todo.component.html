@@ -1,0 +1,36 @@
+<form 
+    [formGroup]="form" 
+    class="form"
+    >
+    <p>Your todo</p>
+    <mat-form-field>
+        <mat-label>Enter todo</mat-label>
+        <textarea  
+            matInput 
+            formControlName="todo"
+            >
+        </textarea>
+        <mat-error *ngIf="form.get('todo')?.invalid">{{getTodoErrorMessage()}}</mat-error>
+    </mat-form-field>
+    <mat-slide-toggle formControlName="completed">Complited</mat-slide-toggle>
+    <div class="button-container">
+        <button 
+            mat-raised-button
+            class="button"
+            color="primary"
+            [disabled]="form.invalid"
+            (click)="save()"
+            >
+            Save
+        </button>
+        <button 
+            mat-raised-button
+            class="button"
+            type="submit"
+            color="warn"
+            (click)="cansel()"
+            >
+            Cansel
+        </button>
+    </div>
+</form>

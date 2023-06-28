@@ -6,10 +6,12 @@ import { Subscription } from 'rxjs';
 import { Todo } from 'src/app/models/todo';
 import { TodoService } from 'src/app/services/todo.service';
 import { CommonModule } from '@angular/common';
-import {MatIconModule} from '@angular/material/icon';
-import {MatDividerModule} from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { BoolCompletedPipe } from 'src/app/pipes/bool-completed.pipe';
+import { TodoComponent } from '../todo/todo.component';
 
 @Component({
     selector: 'app-todos',
@@ -22,18 +24,22 @@ import { BoolCompletedPipe } from 'src/app/pipes/bool-completed.pipe';
         MatDividerModule,
         MatIconModule,
         MatCardModule,
-        BoolCompletedPipe
+        BoolCompletedPipe,
+        TodoComponent,
+        MatDialogModule,
     ]
 })
 export class TodosComponent implements OnInit, OnDestroy {
     public todos: Todo[] | null = null;
     private subscriptions: Subscription[] = [];
+    editableTodo: Todo | null = null
 
     constructor(
         private router: Router,
         private route: ActivatedRoute,
         private authService: AuthenticationService,
-        private todoService: TodoService
+        private todoService: TodoService,
+        private dialog: MatDialog
     ) {
 
     }
@@ -53,8 +59,14 @@ export class TodosComponent implements OnInit, OnDestroy {
     }
 
     public add(): void {
-        const todo = {id: 1, todo: "somtext", completed: false} as Todo;
-        this.todoService.addTodo(todo);
+        this.editableTodo = {todo: "", completed: false} as Todo;
+        const dialogRef = this.dialog.open(TodoComponent, {
+            data: this.editableTodo,
+        });
+      
+        dialogRef.afterClosed().subscribe(result => {
+            console.log(result);
+        });
     }
 
     public changeStatus(id: number): void {

@@ -31,7 +31,6 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 })
 export class LoginComponent implements OnInit {
   public hide = true;
-  public incorrectInput = false;
   public loginForm!: FormGroup;
   public authorize$: Observable<User | boolean> = of(false);
 
