@@ -4,9 +4,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthenticationService {
-  private _token!: string | null;
-  public username!: string | null;
-  public id!: number | null;
+  private _token: string | null = null;
+  public username: string | null = null;
+  public id: number | null = null;
 
   get token() {
     return this._token;

@@ -6,4 +6,15 @@
     >
     LogOut
 </button>
-<app-todo *ngFor="let todo of todos$ | async" [todo]="todo"></app-todo>
+<app-todo 
+    *ngFor="let todo of todos$ | async" 
+    [todo]="todo"
+    class="card"
+    >
+</app-todo>
+<button 
+    mat-fab 
+    color="primary"
+    class="button-add">
+    <mat-icon>add</mat-icon>
+</button>

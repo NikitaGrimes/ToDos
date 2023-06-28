@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { MatButtonModule } from '@angular/material/button';
-import { map, Observable, tap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Todo } from 'src/app/models/todo';
 import { TodoService } from 'src/app/services/todo.service';
 import { CommonModule } from '@angular/common';
 import { TodoComponent } from '../todo/todo.component';
+import {MatIconModule} from '@angular/material/icon';
+import {MatDividerModule} from '@angular/material/divider';
 
 @Component({
     selector: 'app-todos',
@@ -16,7 +18,9 @@ import { TodoComponent } from '../todo/todo.component';
     imports: [
         MatButtonModule,
         CommonModule,
-        TodoComponent
+        TodoComponent,
+        MatDividerModule,
+        MatIconModule
     ]
 })
 export class TodosComponent implements OnInit {
