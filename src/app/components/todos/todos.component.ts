@@ -32,7 +32,6 @@ import { TodoComponent } from '../todo/todo.component';
 export class TodosComponent implements OnInit, OnDestroy {
     public todos: Todo[] | null = null;
     private subscriptions: Subscription[] = [];
-    editableTodo: Todo | null = null
 
     constructor(
         private router: Router,
@@ -59,9 +58,8 @@ export class TodosComponent implements OnInit, OnDestroy {
     }
 
     public add(): void {
-        this.editableTodo = {todo: "", completed: false} as Todo;
         const dialogRef = this.dialog.open(TodoComponent, {
-            data: this.editableTodo,
+            data: null,
         });
       
         dialogRef.afterClosed().subscribe(result => {
@@ -69,12 +67,18 @@ export class TodosComponent implements OnInit, OnDestroy {
         });
     }
 
-    public changeStatus(id: number): void {
-        console.log("change", id);
+    public changeStatus(todo: Todo): void {
+        console.log("change", todo);
     }
 
-    public edit(id: number): void {
-        console.log("edit", id);
+    public edit(todo: Todo): void {
+        const dialogRef = this.dialog.open(TodoComponent, {
+            data: {...todo},
+        });
+      
+        dialogRef.afterClosed().subscribe(result => {
+            console.log(result);
+        });
     }
 
     public delete(id: number): void {

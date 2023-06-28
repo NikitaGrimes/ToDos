@@ -2,11 +2,12 @@ import { NgIf } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { Todo } from 'src/app/models/todo';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-todo',
@@ -30,6 +31,7 @@ export class TodoComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<TodoComponent>,
+    private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: Todo
     ) {
   }
@@ -48,12 +50,17 @@ export class TodoComponent implements OnInit {
   }
 
   public cansel(): void {
-    this.dialogRef.close();
+    if (this.form.pristine) return this.dialogRef.close();
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.dialogRef.close();
+    });
   }
 
   public save(): void {
-    this.data.completed = this.form.getRawValue().todo;
-    this.data.todo = this.form.getRawValue().completed;
+    this.data.todo = this.form.getRawValue().todo;
+    this.data.completed = this.form.getRawValue().completed;
     this.dialogRef.close(this.data);
   }
 }
