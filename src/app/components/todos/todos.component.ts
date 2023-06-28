@@ -33,6 +33,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 export class TodosComponent implements OnInit, OnDestroy {
     public todos: Todo[] | null = null;
     private subscriptions: Subscription[] = [];
+    private addedTodoIds = new Set();
 
     constructor(
         private router: Router,
@@ -78,6 +79,8 @@ export class TodosComponent implements OnInit, OnDestroy {
     }
 
     public edit(todo: Todo): void {
+        if (this.addedTodoIds.has(todo.id)) return;
+
         const dialogRef = this.dialog.open(TodoComponent, {
             data: {...todo},
         });
@@ -88,6 +91,8 @@ export class TodosComponent implements OnInit, OnDestroy {
     }
 
     public delete(id: number): void {
+        if (this.addedTodoIds.has(id)) return;
+
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {data: 'Are you sure?'});
         dialogRef.afterClosed().subscribe((result: boolean) => {
             if (!result) return dialogRef.close();
