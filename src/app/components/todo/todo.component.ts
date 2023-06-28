@@ -52,8 +52,8 @@ export class TodoComponent implements OnInit {
   public cansel(): void {
     if (this.form.pristine) return this.dialogRef.close();
 
-    const dialogRef = this.dialog.open(ConfirmDialogComponent);
-    dialogRef.afterClosed().subscribe(result => {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {data: 'Are you sure? Data will not be saved!'});
+    dialogRef.afterClosed().subscribe((result: boolean) => {
       if (result) this.dialogRef.close();
     });
   }

@@ -12,6 +12,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { BoolCompletedPipe } from 'src/app/pipes/bool-completed.pipe';
 import { TodoComponent } from '../todo/todo.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
     selector: 'app-todos',
@@ -63,6 +64,8 @@ export class TodosComponent implements OnInit, OnDestroy {
         });
       
         dialogRef.afterClosed().subscribe((result: Todo) => {
+            if (!result) return;
+
             result.userId = <number>this.authService.id;
             console.log(result);
         });
@@ -79,12 +82,17 @@ export class TodosComponent implements OnInit, OnDestroy {
             data: {...todo},
         });
       
-        dialogRef.afterClosed().subscribe(result => {
-            console.log(result);
+        dialogRef.afterClosed().subscribe((result: Todo) => {
+            if (result) console.log(result);
         });
     }
 
     public delete(id: number): void {
-        console.log(id);
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {data: 'Are you sure?'});
+        dialogRef.afterClosed().subscribe((result: boolean) => {
+            if (!result) return dialogRef.close();
+
+            console.log(id);
+        });
     }
 }
