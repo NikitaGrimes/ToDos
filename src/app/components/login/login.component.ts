@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
     selector: 'app-login',
@@ -38,7 +39,8 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private userService: UserService,
     private router: Router,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    private authService: AuthenticationService) {
 
   }
 
@@ -64,7 +66,19 @@ export class LoginComponent implements OnInit {
   public submit(): void{
     const username = this.loginForm.getRawValue().username;
     const password = this.loginForm.getRawValue().password;
-    this.authorize$ = this.userService.login(username, password).pipe(catchError(() =>  of(true)), tap(v => console.log(v)), share());
-    //this.router.navigate(['../todos'], {relativeTo: this.route});
+    this.authorize$ = this.userService.login(username, password).pipe(
+      tap(result => {
+        this.login(result as User);
+      }), 
+      catchError(() =>  of(true)), 
+      share()
+    );
+  }
+
+  private login(user: User) {
+    this.authService.token = user.token;
+    this.authService.username = user.username;
+    this.authService.id = user.id;
+    this.router.navigate(['../todos'], {relativeTo: this.route});
   }
 }

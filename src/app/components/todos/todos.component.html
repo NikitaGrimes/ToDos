@@ -1,1 +1,9 @@
-<p>todos works!</p>
+<button 
+    mat-raised-button
+    color="warn"
+    (click)="logout()"
+    class="button-logout"
+    >
+    LogOut
+</button>
+<app-todo *ngFor="let todo of todos$ | async" [todo]="todo"></app-todo>

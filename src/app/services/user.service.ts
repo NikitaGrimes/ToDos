@@ -7,13 +7,13 @@ import { User } from '../models/user';
   providedIn: 'root'
 })
 export class UserService {
-  private loginUrl = "https://dummyjson.com/auth/login";
+  private _loginUrl = "https://dummyjson.com/auth/login";
 
   constructor(
     private http: HttpClient
   ) { }
 
-  public login(username: string, password: string): Observable<User | boolean>{
-    return this.http.post<User | boolean>(this.loginUrl, {'username': username, 'password': password});
+  public login(username: string, password: string): Observable<User>{
+    return this.http.post<User>(this._loginUrl, {'username': username, 'password': password});
   }
 }
