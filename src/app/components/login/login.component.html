@@ -1,7 +1,6 @@
 <form 
     [formGroup]="loginForm" 
     class="form"
-    (ngSubmit)="submit()"
     >
     <p>Login</p>
     <mat-form-field appearance="outline">
@@ -37,6 +36,7 @@
         type="submit"
         color="primary"
         [disabled]="loginForm.invalid || (authorize$ | async) === null"
+        (click)="submit()"
         >
         LogIn
     </button>

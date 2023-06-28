@@ -3,8 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './routers/app-routing.module';
-import { HttpClientModule } from '@angular/common/http';
-import { BoolCompletedPipe } from './pipes/bool-completed.pipe';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './models/auth-interceptor';
 
 @NgModule({
   declarations: [
@@ -16,7 +16,7 @@ import { BoolCompletedPipe } from './pipes/bool-completed.pipe';
     AppRoutingModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
