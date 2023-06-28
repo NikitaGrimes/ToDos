@@ -61,7 +61,7 @@ export class TodosComponent implements OnInit, OnDestroy {
         this.subscriptions.forEach(subscriotion => subscriotion.unsubscribe());
     }
 
-    public logout() {
+    public logout(): void {
         this.authService.logout();
         this.router.navigate(['../login'], {relativeTo: this.route});
     }

@@ -35,12 +35,12 @@
         class="button-submit"
         type="submit"
         color="primary"
-        [disabled]="loginForm.invalid || (authorize$ | async) === null"
+        [disabled]="loginForm.invalid"
         (click)="submit()"
         >
         LogIn
     </button>
-    <mat-error *ngIf="(authorize$ | async) === true">{{getInputErrorMessage()}}</mat-error>
+    <mat-error [class.tranparent]="(authorize$ | async) !== true">{{getInputErrorMessage()}}</mat-error>
 </form>
 <div 
     class="spinner-container"

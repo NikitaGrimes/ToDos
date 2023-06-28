@@ -29,12 +29,15 @@
     width: 100%;
     height: 80%;
     padding-bottom: 20%;
-    background-color: #0001;
-    backdrop-filter: blur(1px);
+    background-color: rgba(0, 0, 0, 0.38);
 }
 
 .spinner{
     position: relative;
     margin-top: auto;
     margin-bottom: auto;
+}
+
+.tranparent{
+    opacity: 0;
 }
