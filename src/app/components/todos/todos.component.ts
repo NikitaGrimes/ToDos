@@ -62,13 +62,16 @@ export class TodosComponent implements OnInit, OnDestroy {
             data: null,
         });
       
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result: Todo) => {
+            result.userId = <number>this.authService.id;
             console.log(result);
         });
     }
 
     public changeStatus(todo: Todo): void {
-        console.log("change", todo);
+        const newTodo = {... todo};
+        newTodo.completed = !newTodo.completed;
+        console.log(newTodo);
     }
 
     public edit(todo: Todo): void {
@@ -82,6 +85,6 @@ export class TodosComponent implements OnInit, OnDestroy {
     }
 
     public delete(id: number): void {
-        console.log("delete", id);
+        console.log(id);
     }
 }

@@ -9,16 +9,33 @@ import { Todo } from '../models/todo';
 export class TodoService {
   private todoUrl = 'https://dummyjson.com/todos';
   private getUserTodosUrl = '/user/';
+  private addTodoUrl = '/add';
+  private updateTodoUrl ='/';
+  private deleteTodoUrl ='/';
 
   constructor(
     private http: HttpClient
   ) { }
 
   public getUserTodos(userId: number): Observable<Todo[]> {
-    return this.http.get<{todos: Todo[]}>(this.todoUrl + this.getUserTodosUrl + userId, {headers:{auth:'true'}}).pipe(map(obj => obj.todos));
+    return this.http.get<{todos: Todo[]}>(this.todoUrl + this.getUserTodosUrl + userId, 
+      {headers: {auth:'true'}}).pipe(map(obj => obj.todos));
   }
 
-  public addTodo(todo: Todo): void {
-    console.log(todo);
+  public addTodo(todo: Todo): Observable<Todo> {
+    return this.http.post<Todo>(this.todoUrl + this.addTodoUrl, 
+      {todo: todo.todo, completed: todo.completed, userId: todo.userId}, 
+      {headers: {auth: 'true'}});
+  }
+
+  public updateTodo(todo: Todo): Observable<Todo> {
+    return this.http.put<Todo>(this.todoUrl + this.updateTodoUrl + todo.id,
+      {todo: todo.todo, completed: todo.completed, userId: todo.userId},
+      {headers: {auth: 'true'}});
+  }
+
+  public deleteTodo(id: number): Observable<Todo> {
+    return this.http.delete<Todo>(this.todoUrl + this.deleteTodoUrl + id, 
+      {headers: {auth:'true'}});
   }
 }
