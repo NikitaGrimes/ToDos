@@ -41,10 +41,10 @@
         LogIn
     </button>
     <mat-error *ngIf="(authorize$ | async) === true">{{getInputErrorMessage()}}</mat-error>
-    <div 
-        class="spinner-container"
-        *ngIf="(authorize$ | async) === null"
-        >
-        <mat-spinner class="spinner"></mat-spinner>
-    </div>
 </form>
+<div 
+    class="spinner-container"
+    *ngIf="(authorize$ | async) === null"
+    >
+    <mat-spinner class="spinner"></mat-spinner>
+</div>

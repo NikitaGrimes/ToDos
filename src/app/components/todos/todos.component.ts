@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { BoolCompletedPipe } from 'src/app/pipes/bool-completed.pipe';
 import { TodoComponent } from '../todo/todo.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-todos',
@@ -28,12 +29,14 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
         BoolCompletedPipe,
         TodoComponent,
         MatDialogModule,
+        MatProgressSpinnerModule
     ]
 })
 export class TodosComponent implements OnInit, OnDestroy {
     public todos: Todo[] | null = null;
     private subscriptions: Subscription[] = [];
     private addedTodoIds = new Set();
+    public loading = false;
 
     constructor(
         private router: Router,
@@ -46,8 +49,12 @@ export class TodosComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.loading = true;
         if (this.authService.id !== null)
-            this.subscriptions.push(this.todoService.getUserTodos(this.authService.id).subscribe(todos => this.todos = todos));
+            this.subscriptions.push(this.todoService.getUserTodos(this.authService.id).subscribe(todos => {
+                this.loading = false;
+                this.todos = todos
+            }));
     }
 
     ngOnDestroy(): void {

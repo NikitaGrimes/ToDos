@@ -22,12 +22,15 @@
 }
 
 .spinner-container{
-    position: absolute;
+    position: fixed;
+    z-index: 2;
     display: flex;
     justify-content: center;
     width: 100%;
-    height: 100%;
-    opacity: 0.8;
+    height: 80%;
+    padding-bottom: 20%;
+    background-color: #0001;
+    backdrop-filter: blur(1px);
 }
 
 .spinner{
