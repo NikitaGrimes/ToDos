@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Todo } from 'src/app/models/todo';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { BoolCompletedPipe } from 'src/app/pipes/bool-completed.pipe';
 
 
 @Component({
@@ -11,7 +12,8 @@ import { MatCardModule } from '@angular/material/card';
   standalone: true,
   imports: [
     MatCardModule,
-    MatButtonModule
+    MatButtonModule,
+    BoolCompletedPipe
   ]
 })
 export class TodoComponent {

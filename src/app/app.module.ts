@@ -4,6 +4,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './routers/app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
+import { BoolCompletedPipe } from './pipes/bool-completed.pipe';
 
 @NgModule({
   declarations: [
