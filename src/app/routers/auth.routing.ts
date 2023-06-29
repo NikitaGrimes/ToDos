@@ -5,6 +5,6 @@ import { todosGuard } from '../guards/todos.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent},
-  { path: 'todos', component: TodosComponent, canActivate: [todosGuard]},
-  { path: '', redirectTo: 'login', pathMatch: 'full'}
+  { path: 'todos', component: TodosComponent, canActivate: [todosGuard] },
+  { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
