@@ -77,9 +77,7 @@ export class LoginComponent implements OnInit {
   }
 
   private login(user: User) {
-    this.authService.token = user.token;
-    this.authService.username = user.username;
-    this.authService.id = user.id;
+    this.authService.logIn(user);
     this.router.navigate(['../todos'], {relativeTo: this.route});
   }
 }
