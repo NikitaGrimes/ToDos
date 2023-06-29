@@ -7,11 +7,9 @@ import { Todo } from '../models/todo';
   providedIn: 'root'
 })
 export class TodoService {
-  private todoUrl = 'https://dummyjson.com/todos';
-  private getUserTodosUrl = '/user/';
-  private addTodoUrl = '/add';
-  private updateTodoUrl ='/';
-  private deleteTodoUrl ='/';
+  private todoUrl = 'https://dummyjson.com/todos/';
+  private getUserTodosUrl = 'user/';
+  private addTodoUrl = 'add';
 
   constructor(
     private http: HttpClient
@@ -29,13 +27,13 @@ export class TodoService {
   }
 
   public updateTodo(todo: Todo): Observable<Todo> {
-    return this.http.put<Todo>(this.todoUrl + this.updateTodoUrl + todo.id,
+    return this.http.put<Todo>(this.todoUrl + todo.id,
       {todo: todo.todo, completed: todo.completed, userId: todo.userId},
       {headers: {auth: 'true'}});
   }
 
   public deleteTodo(id: number): Observable<Todo> {
-    return this.http.delete<Todo>(this.todoUrl + this.deleteTodoUrl + id, 
+    return this.http.delete<Todo>(this.todoUrl + id, 
       {headers: {auth:'true'}});
   }
 }

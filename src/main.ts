@@ -2,7 +2,7 @@ import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS, provideHttpClient, wit
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { AppComponent } from './app/app.component';
-import { routes } from './app/routers/app-routing';
+import { routes } from './app/routers/app.routing';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { AuthInterceptor } from './app/models/auth-interceptor';
 

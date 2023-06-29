@@ -1,8 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { MatButtonModule } from '@angular/material/button';
-import { Subscription } from 'rxjs';
 import { Todo } from 'src/app/models/todo';
 import { TodoService } from 'src/app/services/todo.service';
 import { CommonModule } from '@angular/common';
@@ -32,9 +31,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         MatProgressSpinnerModule
     ]
 })
-export class TodosComponent implements OnInit, OnDestroy {
+export class TodosComponent implements OnInit {
     public todos: Todo[] | null = null;
-    private subscriptions: Subscription[] = [];
     private addedTodoIds = new Set();
     public loading = false;
 
@@ -51,14 +49,9 @@ export class TodosComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.loading = true;
         if (this.authService.id !== null)
-            this.subscriptions.push(this.todoService.getUserTodos(this.authService.id).subscribe(todos => {
+            this.todoService.getUserTodos(this.authService.id).subscribe(todos => {
                 this.loading = false;
-                this.todos = todos
-            }));
-    }
-
-    ngOnDestroy(): void {
-        this.subscriptions.forEach(subscriotion => subscriotion.unsubscribe());
+                this.todos = todos});
     }
 
     public logout(): void {
