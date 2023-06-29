@@ -13,6 +13,7 @@ import { BoolCompletedPipe } from 'src/app/pipes/bool-completed.pipe';
 import { TodoComponent } from '../todo/todo.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-todos',
@@ -28,12 +29,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         BoolCompletedPipe,
         TodoComponent,
         MatDialogModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        MatSnackBarModule
     ]
 })
 export class TodosComponent implements OnInit {
-    public todos: Todo[] | null = null;
     private addedTodoIds = new Set();
+    private durationInSecond = 3;
+    public todos: Todo[] = [];
     public loading = false;
 
     constructor(
@@ -41,7 +44,8 @@ export class TodosComponent implements OnInit {
         private route: ActivatedRoute,
         private authService: AuthenticationService,
         private todoService: TodoService,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private snackBar: MatSnackBar
     ) {
 
     }
@@ -60,44 +64,87 @@ export class TodosComponent implements OnInit {
     }
 
     public add(): void {
-        const dialogRef = this.dialog.open(TodoComponent, {
-            data: null,
-        });
+        const dialogRef = this.dialog.open(TodoComponent);
       
         dialogRef.afterClosed().subscribe((result: Todo) => {
             if (!result) return;
 
+            this.loading = true;
             result.userId = <number>this.authService.id;
-            console.log(result);
+            this.todoService.addTodo(result).subscribe((todo: Todo) => {
+                this.todos.push(todo);
+                this.addedTodoIds.add(todo.id);
+                this.loading = false;
+            })
         });
     }
 
     public changeStatus(todo: Todo): void {
+        if (this.addedTodoIds.has(todo.id)) {
+            this.snackBar.open("You can't edit added todo!", undefined, {
+                duration: this.durationInSecond * 1000
+            });
+            return;
+        }
+
         const newTodo = {... todo};
         newTodo.completed = !newTodo.completed;
-        console.log(newTodo);
+        this.loading = true;
+        this.todoService.updateTodo(newTodo).subscribe((editableTodo: Todo) => {
+            const index = this.todos.findIndex(predicateTodo => predicateTodo.id === editableTodo.id);
+            if (index !== -1){
+                this.todos[index] = editableTodo;
+            }
+            this.loading = false;
+        })
     }
 
     public edit(todo: Todo): void {
-        if (this.addedTodoIds.has(todo.id)) return;
+        if (this.addedTodoIds.has(todo.id)) {
+            this.snackBar.open("You can't edit added todo!", undefined, {
+                duration: this.durationInSecond * 1000
+            });
+            return;
+        }
 
         const dialogRef = this.dialog.open(TodoComponent, {
             data: {...todo},
         });
       
-        dialogRef.afterClosed().subscribe((result: Todo) => {
-            if (result) console.log(result);
+        dialogRef.afterClosed().subscribe((editableTodo: Todo) => {
+            if (!editableTodo) return;
+
+            this.loading = true;
+            this.todoService.updateTodo(editableTodo).subscribe((todo: Todo) => {
+                const index = this.todos.findIndex(predicateTodo => predicateTodo.id === todo.id);
+                if (index !== -1)
+                    this.todos[index] = todo;
+                
+                this.loading = false;
+            })
         });
     }
 
     public delete(id: number): void {
-        if (this.addedTodoIds.has(id)) return;
+        if (this.addedTodoIds.has(id)) {
+            this.snackBar.open("You can't delete added todo!", undefined, {
+                duration: this.durationInSecond * 1000
+            });
+            return;
+        }
 
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {data: 'Are you sure?'});
         dialogRef.afterClosed().subscribe((result: boolean) => {
             if (!result) return dialogRef.close();
 
-            console.log(id);
+            this.loading = true;
+            this.todoService.deleteTodo(id).subscribe((todo: Todo) => {
+                const index = this.todos.findIndex(predcateTodo => predcateTodo.id === todo.id)
+                if (index !== -1)
+                    this.todos.splice(index, 1);
+                
+                this.loading = false
+            })
         });
     }
 }

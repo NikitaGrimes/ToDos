@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Validators, FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { catchError, Observable, of, share, tap } from 'rxjs';
 import { User } from 'src/app/models/user';
@@ -27,7 +27,8 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
       MatIconModule, 
       AsyncPipe,
       MatProgressSpinnerModule
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent implements OnInit {
   public hide = true;
