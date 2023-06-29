@@ -50,7 +50,7 @@ export class TodoComponent implements OnInit {
     return 'Enter your todo.';
   }
 
-  public cansel(): void {
+  public cancel(): void {
     if (this.form.pristine) return this.dialogRef.close();
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {data: 'Are you sure? Data will not be saved!'});

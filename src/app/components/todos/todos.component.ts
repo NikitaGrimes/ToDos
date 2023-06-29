@@ -12,9 +12,9 @@ import { MatCardModule } from '@angular/material/card';
 import { BoolCompletedPipe } from 'src/app/pipes/bool-completed.pipe';
 import { TodoComponent } from '../todo/todo.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { catchError, of } from 'rxjs';
+import { SpinnerComponent } from '../spinner/spinner.component';
 
 @Component({
     selector: 'app-todos',
@@ -30,8 +30,8 @@ import { catchError, of } from 'rxjs';
         BoolCompletedPipe,
         TodoComponent,
         MatDialogModule,
-        MatProgressSpinnerModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        SpinnerComponent
     ]
 })
 export class TodosComponent implements OnInit {

@@ -58,10 +58,4 @@
     >
     <mat-icon>add</mat-icon>
 </button>
-
-<div 
-    class="spinner-container"
-    *ngIf="loading"
-    >
-    <mat-spinner class="spinner"></mat-spinner>
-</div>
+<app-spinner *ngIf="loading"></app-spinner>

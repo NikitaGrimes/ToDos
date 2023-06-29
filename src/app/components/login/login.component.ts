@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Validators, FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { catchError, Observable, of, share, tap } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,9 +8,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { NgIf, AsyncPipe } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { SpinnerComponent } from '../spinner/spinner.component';
+import { LoginForm } from 'src/app/models/login-form';
+import { Login } from 'src/app/models/login';
 
 @Component({
     selector: 'app-login',
@@ -26,14 +28,14 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
       MatButtonModule, 
       MatIconModule, 
       AsyncPipe,
-      MatProgressSpinnerModule
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+      SpinnerComponent
+    ]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   public hide = true;
-  public loginForm!: FormGroup;
-  public authorize$: Observable<User | boolean> = of(false);
+  public loginForm: FormGroup<LoginForm>;
+  public loading = false;
+  public error = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -42,38 +44,23 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private authService: AuthenticationService
     ) {
-
-  }
-
-  ngOnInit(): void {
-    this.loginForm = this.formBuilder.group({
-      username: this.formBuilder.control('atuny0', [Validators.required]),
-      password: this.formBuilder.control('9uQFF1Lh', [Validators.required])
-    });
-  }
-
-  public getUsernameErrorMessage(): string {
-    return "Enter your username.";
-  }
-
-  public getPasswordErrorMessage(): string {
-    return "Enter your password."
-  }
-
-  public getInputErrorMessage() {
-    return 'Incorrect username or password!';
+      this.loginForm = this.formBuilder.group({
+        username: this.formBuilder.control('atuny0', {nonNullable: true, validators: [Validators.required]}),
+        password: this.formBuilder.control('9uQFF1Lh', {nonNullable: true, validators: [Validators.required]})
+      });
   }
 
   public submit(): void{
-    const username = this.loginForm.getRawValue().username;
-    const password = this.loginForm.getRawValue().password;
-    this.authorize$ = this.userService.login(username, password).pipe(
-      tap(result => {
-        this.login(result as User);
-      }), 
-      catchError(() =>  of(true)), 
-      share()
-    );
+    this.error = false;
+    this.loading = true;
+    const formValue: Login = this.loginForm.getRawValue();
+    this.userService.login(formValue)
+      .pipe(catchError(() => of(null)))
+      .subscribe(result => {
+        this.loading = false;
+        if (result) this.login(result);
+        else this.error = true;
+    })
   }
 
   private login(user: User) {

@@ -1,8 +1,8 @@
+<h2>Login</h2>
 <form 
     [formGroup]="loginForm" 
     class="form"
     >
-    <p class="text">Login</p>
     <mat-form-field appearance="outline">
         <mat-label>Enter username</mat-label>
         <input 
@@ -10,7 +10,7 @@
             placeholder="Username" 
             formControlName="username"
             >
-        <mat-error *ngIf="loginForm.get('username')?.invalid">{{getUsernameErrorMessage()}}</mat-error>
+        <mat-error *ngIf="loginForm.get('username')?.invalid">Enter your username.</mat-error>
     </mat-form-field>
     <mat-form-field appearance="outline">
         <mat-label>Enter password</mat-label>
@@ -28,7 +28,7 @@
             >
             <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
-        <mat-error *ngIf="loginForm.get('password')?.invalid">{{getPasswordErrorMessage()}}</mat-error>
+        <mat-error *ngIf="loginForm.get('password')?.invalid">Enter your password.</mat-error>
     </mat-form-field>
     <button 
         mat-raised-button
@@ -40,11 +40,6 @@
         >
         LogIn
     </button>
-    <mat-error [class.tranparent]="(authorize$ | async) !== true">{{getInputErrorMessage()}}</mat-error>
 </form>
-<div 
-    class="spinner-container"
-    *ngIf="(authorize$ | async) === null"
-    >
-    <mat-spinner class="spinner"></mat-spinner>
-</div>
+<mat-error *ngIf="error">Incorrect username or password!</mat-error>
+<app-spinner *ngIf="loading"></app-spinner>
