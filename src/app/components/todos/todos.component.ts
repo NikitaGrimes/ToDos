@@ -72,9 +72,11 @@ export class TodosComponent implements OnInit {
             this.loading = true;
             result.userId = <number>this.authService.id;
             this.todoService.addTodo(result).subscribe((todo: Todo) => {
+                this.loading = false;
+                if (!todo) return;
+
                 this.todos.push(todo);
                 this.addedTodoIds.add(todo.id);
-                this.loading = false;
             })
         });
     }
@@ -91,11 +93,13 @@ export class TodosComponent implements OnInit {
         newTodo.completed = !newTodo.completed;
         this.loading = true;
         this.todoService.updateTodo(newTodo).subscribe((editableTodo: Todo) => {
+            this.loading = false;
+            if (!editableTodo) return;
+
             const index = this.todos.findIndex(predicateTodo => predicateTodo.id === editableTodo.id);
             if (index !== -1){
                 this.todos[index] = editableTodo;
             }
-            this.loading = false;
         })
     }
 
@@ -116,11 +120,12 @@ export class TodosComponent implements OnInit {
 
             this.loading = true;
             this.todoService.updateTodo(editableTodo).subscribe((todo: Todo) => {
+                this.loading = false;
+                if (!todo) return;
+
                 const index = this.todos.findIndex(predicateTodo => predicateTodo.id === todo.id);
                 if (index !== -1)
                     this.todos[index] = todo;
-                
-                this.loading = false;
             })
         });
     }
@@ -139,11 +144,12 @@ export class TodosComponent implements OnInit {
 
             this.loading = true;
             this.todoService.deleteTodo(id).subscribe((todo: Todo) => {
+                this.loading = false;
+                if (!todo) return;
+                
                 const index = this.todos.findIndex(predcateTodo => predcateTodo.id === todo.id)
                 if (index !== -1)
                     this.todos.splice(index, 1);
-                
-                this.loading = false
             })
         });
     }
