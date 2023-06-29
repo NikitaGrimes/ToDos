@@ -14,6 +14,7 @@ import { TodoComponent } from '../todo/todo.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { catchError, of } from 'rxjs';
 
 @Component({
     selector: 'app-todos',
@@ -71,13 +72,17 @@ export class TodosComponent implements OnInit {
 
             this.loading = true;
             result.userId = <number>this.authService.id;
-            this.todoService.addTodo(result).subscribe((todo: Todo) => {
-                this.loading = false;
-                if (!todo) return;
+            this.todoService
+                .addTodo(result)
+                .pipe(catchError(() => of(null)))
+                .subscribe((todo: Todo | null) => {
+                    this.loading = false;
+                    if (!todo) return;
 
-                this.todos.push(todo);
-                this.addedTodoIds.add(todo.id);
-            })
+                    this.todos.push(todo);
+                    this.addedTodoIds.add(todo.id);
+                }
+            )
         });
     }
 
@@ -92,15 +97,18 @@ export class TodosComponent implements OnInit {
         const newTodo = {... todo};
         newTodo.completed = !newTodo.completed;
         this.loading = true;
-        this.todoService.updateTodo(newTodo).subscribe((editableTodo: Todo) => {
-            this.loading = false;
-            if (!editableTodo) return;
+        this.todoService.updateTodo(newTodo)
+            .pipe(catchError(() => of(null)))
+            .subscribe((editableTodo: Todo | null) => {
+                this.loading = false;
+                if (!editableTodo) return;
 
-            const index = this.todos.findIndex(predicateTodo => predicateTodo.id === editableTodo.id);
-            if (index !== -1){
-                this.todos[index] = editableTodo;
+                const index = this.todos.findIndex(predicateTodo => predicateTodo.id === editableTodo.id);
+                if (index !== -1){
+                    this.todos[index] = editableTodo;
+                }
             }
-        })
+        )
     }
 
     public edit(todo: Todo): void {
@@ -119,14 +127,17 @@ export class TodosComponent implements OnInit {
             if (!editableTodo) return;
 
             this.loading = true;
-            this.todoService.updateTodo(editableTodo).subscribe((todo: Todo) => {
-                this.loading = false;
-                if (!todo) return;
+            this.todoService.updateTodo(editableTodo)
+                .pipe(catchError(() => of(null)))
+                .subscribe((todo: Todo | null) => {
+                    this.loading = false;
+                    if (!todo) return;
 
-                const index = this.todos.findIndex(predicateTodo => predicateTodo.id === todo.id);
-                if (index !== -1)
-                    this.todos[index] = todo;
-            })
+                    const index = this.todos.findIndex(predicateTodo => predicateTodo.id === todo.id);
+                    if (index !== -1)
+                        this.todos[index] = todo;
+                }
+            )
         });
     }
 
@@ -143,14 +154,17 @@ export class TodosComponent implements OnInit {
             if (!result) return dialogRef.close();
 
             this.loading = true;
-            this.todoService.deleteTodo(id).subscribe((todo: Todo) => {
-                this.loading = false;
-                if (!todo) return;
-                
-                const index = this.todos.findIndex(predcateTodo => predcateTodo.id === todo.id)
-                if (index !== -1)
-                    this.todos.splice(index, 1);
-            })
+            this.todoService.deleteTodo(id)
+                .pipe(catchError(() => of(null)))
+                .subscribe((todo: Todo | null) => {
+                    this.loading = false;
+                    if (!todo) return;
+                    
+                    const index = this.todos.findIndex(predcateTodo => predcateTodo.id === todo.id)
+                    if (index !== -1)
+                        this.todos.splice(index, 1);
+                }
+            )
         });
     }
 }
