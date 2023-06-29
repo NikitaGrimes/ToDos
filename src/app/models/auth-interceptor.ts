@@ -8,7 +8,7 @@ export class AuthInterceptor  implements HttpInterceptor {
 
     intercept(req: HttpRequest<unknown>, next: HttpHandler) {
         if (!req.headers.get('auth')) return next.handle(req);
-
+        
         let token = this.auth.token;
         if (token === null)
             token = "";
