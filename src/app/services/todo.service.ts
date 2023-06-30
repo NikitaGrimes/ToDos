@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Todo } from '../models/todo';
-import { makeApiUrl } from '../utils/api.url.util';
+import { makeApiUrl } from '../utils/api-url.util';
 
 @Injectable({
   providedIn: 'root'
