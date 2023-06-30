@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Validators, FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { catchError, of } from 'rxjs';
 import { User } from 'src/app/models/user';
@@ -30,7 +30,7 @@ import { Login } from 'src/app/models/login';
       SpinnerComponent
     ]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   public hide = true;
   public loginForm: FormGroup<LoginForm>;
   public loading = false;
@@ -47,10 +47,6 @@ export class LoginComponent implements OnInit {
         username: this.formBuilder.control('atuny0', {nonNullable: true, validators: [Validators.required]}),
         password: this.formBuilder.control('9uQFF1Lh', {nonNullable: true, validators: [Validators.required]})
       });
-  }
-
-  public ngOnInit(): void {
-    this.authService.logout();
   }
 
   public submit(): void{

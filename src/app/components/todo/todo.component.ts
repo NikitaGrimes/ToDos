@@ -45,7 +45,7 @@ export class TodoComponent {
     private authService: AuthenticationService,
     private todoService: TodoService,
     private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data?: Todo
+    @Inject(MAT_DIALOG_DATA) private data?: Todo
     ) {
       let todo = "";
       let completed = false;
@@ -79,8 +79,7 @@ export class TodoComponent {
           this.updateData(todo);
         }
       )
-    }
-    else{
+    } else{
       const editableTodo: Todo = {id: this.data.id, ...this.todoForm.getRawValue(), userId: this.data.userId};
       this.todoService.updateTodo(editableTodo)
         .pipe(catchError(() => of(null)))

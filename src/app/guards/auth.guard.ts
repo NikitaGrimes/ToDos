@@ -5,13 +5,12 @@ import { AuthenticationService } from '../services/authentication.service';
 export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthenticationService);
   if (authService.token === null) {
-    if (localStorage.getItem('token')) {
-      authService.token = localStorage.getItem('token');
-      authService.id = parseInt(<string>localStorage.getItem('userId'));
-      return true;
-    }
+    if (!localStorage.getItem('token')) 
+      return inject(Router).navigate(['/auth/login']);
 
-    return inject(Router).navigate(['/auth/login'])
+    authService.token = localStorage.getItem('token');
+    authService.id = parseInt(<string>localStorage.getItem('userId'));
+    return true;
   }
 
   return true;

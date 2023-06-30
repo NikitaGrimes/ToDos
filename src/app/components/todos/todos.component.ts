@@ -53,7 +53,7 @@ export class TodosComponent implements OnInit {
 
     }
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.loading = true;
         if (this.authService.id !== null)
             this.todoService.getUserTodos(this.authService.id).subscribe(todos => {
@@ -68,7 +68,6 @@ export class TodosComponent implements OnInit {
 
     public add(): void {
         const dialogRef = this.dialog.open(TodoComponent);
-      
         dialogRef.afterClosed().subscribe((result: Todo | null) => {
             if (!result) return;
             
@@ -78,13 +77,7 @@ export class TodosComponent implements OnInit {
     }
 
     public changeStatus(todo: Todo): void {
-        if (this.addedTodoIds.has(todo.id)) {
-            todo.completed = !todo.completed;
-            this.snackBar.open("You can't edit added todo!", undefined, {
-                duration: this.durationInSecond * 1000
-            });
-            return;
-        }
+        if (this.checkAddedTodo(todo.id, "You can't edit added todo!")) return;
 
         this.loading = true;
         this.todoService.updateTodo(todo)
@@ -102,12 +95,7 @@ export class TodosComponent implements OnInit {
     }
 
     public edit(todo: Todo): void {
-        if (this.addedTodoIds.has(todo.id)) {
-            this.snackBar.open("You can't edit added todo!", undefined, {
-                duration: this.durationInSecond * 1000
-            });
-            return;
-        }
+        if (this.checkAddedTodo(todo.id, "You can't edit added todo!")) return;
 
         const dialogRef = this.dialog.open(TodoComponent, {
             data: todo,
@@ -123,12 +111,7 @@ export class TodosComponent implements OnInit {
     }
 
     public delete(id: number): void {
-        if (this.addedTodoIds.has(id)) {
-            this.snackBar.open("You can't delete added todo!", undefined, {
-                duration: this.durationInSecond * 1000
-            });
-            return;
-        }
+        if (this.checkAddedTodo(id, "You can't delete added todo!")) return;
 
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {data: 'Are you sure?'});
         dialogRef.afterClosed().subscribe((result: boolean) => {
@@ -139,7 +122,12 @@ export class TodosComponent implements OnInit {
                 .pipe(catchError(() => of(null)))
                 .subscribe((todo: Todo | null) => {
                     this.loading = false;
-                    if (!todo) return;
+                    if (!todo) {
+                        this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
+                            duration: this.durationInSecond * 1000
+                        });
+                        return;
+                    }
                     
                     const index = this.todos.findIndex(predicateTodo => predicateTodo.id === todo.id)
                     if (index !== -1)
@@ -147,5 +135,16 @@ export class TodosComponent implements OnInit {
                 }
             )
         });
+    }
+
+    private checkAddedTodo(id: number, message: string): boolean{
+        if (this.addedTodoIds.has(id)) {
+            this.snackBar.open(message, undefined, {
+                duration: this.durationInSecond * 1000
+            });
+            return true;
+        }
+
+        return false;
     }
 }
