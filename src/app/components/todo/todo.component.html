@@ -1,5 +1,5 @@
 <form 
-    [formGroup]="form" 
+    [formGroup]="todoForm" 
     class="form"
     >
     <p>Your todo</p>
@@ -10,15 +10,15 @@
             formControlName="todo"
             >
         </textarea>
-        <mat-error *ngIf="form.get('todo')?.invalid">{{getTodoErrorMessage()}}</mat-error>
+        <mat-error *ngIf="todoForm.get('todo')?.invalid">Enter your todo.</mat-error>
     </mat-form-field>
-    <mat-slide-toggle formControlName="completed">Complited</mat-slide-toggle>
+    <mat-slide-toggle formControlName="completed">Completed</mat-slide-toggle>
     <div class="button-container">
         <button 
             mat-raised-button
             class="button"
             color="primary"
-            [disabled]="form.invalid"
+            [disabled]="todoForm.invalid"
             (click)="save()"
             >
             Save
@@ -34,3 +34,4 @@
         </button>
     </div>
 </form>
+<app-spinner *ngIf="loading"></app-spinner>

@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Validators, FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { catchError, of } from 'rxjs';
 import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { NgIf, AsyncPipe } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,11 +27,10 @@ import { Login } from 'src/app/models/login';
       NgIf, 
       MatButtonModule, 
       MatIconModule, 
-      AsyncPipe,
       SpinnerComponent
     ]
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   public hide = true;
   public loginForm: FormGroup<LoginForm>;
   public loading = false;
@@ -50,16 +49,21 @@ export class LoginComponent {
       });
   }
 
+  public ngOnInit(): void {
+    this.authService.logout();
+  }
+
   public submit(): void{
     this.error = false;
     this.loading = true;
     const formValue: Login = this.loginForm.getRawValue();
     this.userService.login(formValue)
       .pipe(catchError(() => of(null)))
-      .subscribe(result => {
+      .subscribe((result: User | null) => {
         this.loading = false;
-        if (result) this.login(result);
-        else this.error = true;
+        if (result) {
+          this.login(result);
+        } else this.error = true;
     })
   }
 

@@ -9,12 +9,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
-import { BoolCompletedPipe } from 'src/app/pipes/bool-completed.pipe';
 import { TodoComponent } from '../todo/todo.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { catchError, of } from 'rxjs';
 import { SpinnerComponent } from '../spinner/spinner.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-todos',
@@ -27,11 +28,12 @@ import { SpinnerComponent } from '../spinner/spinner.component';
         MatDividerModule,
         MatIconModule,
         MatCardModule,
-        BoolCompletedPipe,
         TodoComponent,
         MatDialogModule,
         MatSnackBarModule,
-        SpinnerComponent
+        SpinnerComponent,
+        MatSlideToggleModule,
+        FormsModule,
     ]
 })
 export class TodosComponent implements OnInit {
@@ -67,48 +69,36 @@ export class TodosComponent implements OnInit {
     public add(): void {
         const dialogRef = this.dialog.open(TodoComponent);
       
-        dialogRef.afterClosed().subscribe((result: Todo) => {
+        dialogRef.afterClosed().subscribe((result: Todo | null) => {
             if (!result) return;
-
-            this.loading = true;
-            result.userId = <number>this.authService.id;
-            this.todoService
-                .addTodo(result)
-                .pipe(catchError(() => of(null)))
-                .subscribe((todo: Todo | null) => {
-                    this.loading = false;
-                    if (!todo) return;
-
-                    this.todos.push(todo);
-                    this.addedTodoIds.add(todo.id);
-                }
-            )
+            
+            this.todos.push(result);
+            this.addedTodoIds.add(result.id);
         });
     }
 
     public changeStatus(todo: Todo): void {
         if (this.addedTodoIds.has(todo.id)) {
+            todo.completed = !todo.completed;
             this.snackBar.open("You can't edit added todo!", undefined, {
                 duration: this.durationInSecond * 1000
             });
             return;
         }
 
-        const newTodo = {... todo};
-        newTodo.completed = !newTodo.completed;
         this.loading = true;
-        this.todoService.updateTodo(newTodo)
+        this.todoService.updateTodo(todo)
             .pipe(catchError(() => of(null)))
             .subscribe((editableTodo: Todo | null) => {
                 this.loading = false;
-                if (!editableTodo) return;
+                if (editableTodo) return;
 
-                const index = this.todos.findIndex(predicateTodo => predicateTodo.id === editableTodo.id);
-                if (index !== -1){
-                    this.todos[index] = editableTodo;
-                }
+                todo.completed = !todo.completed;
+                this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
+                    duration: this.durationInSecond * 1000
+                });
             }
-        )
+        ) 
     }
 
     public edit(todo: Todo): void {
@@ -120,24 +110,15 @@ export class TodosComponent implements OnInit {
         }
 
         const dialogRef = this.dialog.open(TodoComponent, {
-            data: {...todo},
+            data: todo,
         });
       
-        dialogRef.afterClosed().subscribe((editableTodo: Todo) => {
+        dialogRef.afterClosed().subscribe((editableTodo: Todo | null) => {
             if (!editableTodo) return;
 
-            this.loading = true;
-            this.todoService.updateTodo(editableTodo)
-                .pipe(catchError(() => of(null)))
-                .subscribe((todo: Todo | null) => {
-                    this.loading = false;
-                    if (!todo) return;
-
-                    const index = this.todos.findIndex(predicateTodo => predicateTodo.id === todo.id);
-                    if (index !== -1)
-                        this.todos[index] = todo;
-                }
-            )
+            const index = this.todos.findIndex(predicateTodo => predicateTodo.id === editableTodo.id);
+            if (index !== -1)
+                this.todos[index] = editableTodo;
         });
     }
 
@@ -160,7 +141,7 @@ export class TodosComponent implements OnInit {
                     this.loading = false;
                     if (!todo) return;
                     
-                    const index = this.todos.findIndex(predcateTodo => predcateTodo.id === todo.id)
+                    const index = this.todos.findIndex(predicateTodo => predicateTodo.id === todo.id)
                     if (index !== -1)
                         this.todos.splice(index, 1);
                 }

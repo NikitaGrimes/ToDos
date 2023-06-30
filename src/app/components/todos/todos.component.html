@@ -1,3 +1,6 @@
+<h2 class="title">
+    Your todos
+</h2>
 <button 
     mat-raised-button
     color="warn"
@@ -22,18 +25,14 @@
         <p>
             {{todo.todo}}
         </p>
-        <p>
-            Status: {{todo.completed | boolCompleted}}
-        </p>
-    </mat-card-content>
-    <mat-card-actions>
-        <button 
-            mat-button 
-            color="accent"
+        <mat-slide-toggle
+            [(ngModel)]="todo.completed"
             (click)="changeStatus(todo)"
             >
-            CHANGE STATUS
-        </button>
+        Completed
+      </mat-slide-toggle>
+    </mat-card-content>
+    <mat-card-actions>
         <button 
             mat-button 
             color="primary"
