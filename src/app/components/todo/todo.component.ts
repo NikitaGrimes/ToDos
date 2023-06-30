@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -31,7 +31,8 @@ import { SpinnerComponent } from '../spinner/spinner.component';
     MatDialogModule,
     MatSnackBarModule,
     SpinnerComponent
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TodoComponent {
   public todoForm: FormGroup<TodoForm>;
@@ -45,6 +46,7 @@ export class TodoComponent {
     private authService: AuthenticationService,
     private todoService: TodoService,
     private snackBar: MatSnackBar,
+    private changeDetector: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) private data?: Todo
     ) {
       let todo = "";
@@ -91,6 +93,7 @@ export class TodoComponent {
 
   private updateData(todo: Todo | null): void{
     this.loading = false;
+    this.changeDetector.markForCheck();
     if (!todo) {
       this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
         duration: this.durationInSecond * 1000

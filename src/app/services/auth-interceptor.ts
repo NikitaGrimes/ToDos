@@ -4,7 +4,6 @@ import { AuthenticationService } from "./authentication.service";
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     if (!req.withCredentials) return next(req);
-    
     let token = inject(AuthenticationService).token;
     if (token === null)
         token = "";

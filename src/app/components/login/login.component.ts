@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { Validators, FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { catchError, of } from 'rxjs';
 import { User } from 'src/app/models/user';
@@ -28,7 +28,8 @@ import { Login } from 'src/app/models/login';
       MatButtonModule, 
       MatIconModule, 
       SpinnerComponent
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {
   public hide = true;
@@ -41,7 +42,8 @@ export class LoginComponent {
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private changeDetector: ChangeDetectorRef
     ) {
       this.loginForm = this.formBuilder.group({
         username: this.formBuilder.control('atuny0', {nonNullable: true, validators: [Validators.required]}),
@@ -60,6 +62,7 @@ export class LoginComponent {
         if (result) {
           this.login(result);
         } else this.error = true;
+        this.changeDetector.markForCheck();
     })
   }
 

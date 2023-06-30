@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,7 +14,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { catchError, of } from 'rxjs';
 import { SpinnerComponent } from '../spinner/spinner.component';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -34,7 +34,8 @@ import { FormsModule } from '@angular/forms';
         SpinnerComponent,
         MatSlideToggleModule,
         FormsModule,
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TodosComponent implements OnInit {
     private addedTodoIds = new Set();
@@ -48,7 +49,8 @@ export class TodosComponent implements OnInit {
         private authService: AuthenticationService,
         private todoService: TodoService,
         private dialog: MatDialog,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
+        private changeDetector: ChangeDetectorRef
     ) {
 
     }
@@ -56,9 +58,20 @@ export class TodosComponent implements OnInit {
     public ngOnInit(): void {
         this.loading = true;
         if (this.authService.id !== null)
-            this.todoService.getUserTodos(this.authService.id).subscribe(todos => {
+            this.todoService.getUserTodos(this.authService.id)
+                .pipe(catchError(() => of(null)))
+                .subscribe((todos: Todo[] | null) => {
                 this.loading = false;
-                this.todos = todos});
+                this.changeDetector.markForCheck();
+                if (!todos) {
+                    this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
+                    duration: this.durationInSecond * 1000
+                    });
+                    return;
+                }
+                this.todos = todos;
+            }
+        );
     }
 
     public logout(): void {
@@ -72,18 +85,25 @@ export class TodosComponent implements OnInit {
             if (!result) return;
             
             this.todos.push(result);
+            this.changeDetector.markForCheck();
             this.addedTodoIds.add(result.id);
         });
     }
 
-    public changeStatus(todo: Todo): void {
-        if (this.checkAddedTodo(todo.id, "You can't edit added todo!")) return;
+    public changeStatus(todo: Todo, e: MatSlideToggleChange): void {
+        if (this.checkAddedTodo(todo.id, "You can't edit added todo!")) {
+            todo.completed = !todo.completed;
+            e.source.checked = todo.completed;
+            return;
+        }
 
         this.loading = true;
+        this.changeDetector.markForCheck();
         this.todoService.updateTodo(todo)
             .pipe(catchError(() => of(null)))
             .subscribe((editableTodo: Todo | null) => {
                 this.loading = false;
+                this.changeDetector.markForCheck();
                 if (editableTodo) return;
 
                 todo.completed = !todo.completed;
@@ -107,6 +127,8 @@ export class TodosComponent implements OnInit {
             const index = this.todos.findIndex(predicateTodo => predicateTodo.id === editableTodo.id);
             if (index !== -1)
                 this.todos[index] = editableTodo;
+
+            this.changeDetector.markForCheck();
         });
     }
 
@@ -118,6 +140,7 @@ export class TodosComponent implements OnInit {
             if (!result) return dialogRef.close();
 
             this.loading = true;
+            this.changeDetector.markForCheck();
             this.todoService.deleteTodo(id)
                 .pipe(catchError(() => of(null)))
                 .subscribe((todo: Todo | null) => {
@@ -132,6 +155,8 @@ export class TodosComponent implements OnInit {
                     const index = this.todos.findIndex(predicateTodo => predicateTodo.id === todo.id)
                     if (index !== -1)
                         this.todos.splice(index, 1);
+                    
+                    this.changeDetector.markForCheck();
                 }
             )
         });

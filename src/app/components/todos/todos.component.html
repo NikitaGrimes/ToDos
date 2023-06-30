@@ -1,6 +1,4 @@
-<h2 class="title">
-    Your todos
-</h2>
+<h1 class="title">Your todos</h1>
 <button 
     mat-raised-button
     color="warn"
@@ -27,7 +25,7 @@
         </p>
         <mat-slide-toggle
             [(ngModel)]="todo.completed"
-            (click)="changeStatus(todo)"
+            (change)="changeStatus(todo, $event)"
             >
         Completed
       </mat-slide-toggle>
