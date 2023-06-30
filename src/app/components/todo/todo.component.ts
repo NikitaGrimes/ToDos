@@ -49,15 +49,9 @@ export class TodoComponent {
     private changeDetector: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) private data?: Todo
     ) {
-      let todo = "";
-      let completed = false;
-      if (data) {
-        todo = data.todo;
-        completed = data.completed;
-      }
       this.todoForm = this.formBuilder.group({
-        todo: this.formBuilder.control(todo, {nonNullable: true, validators: [Validators.required]}),
-        completed: this.formBuilder.control(completed, {nonNullable: true, validators: [Validators.required]})
+        todo: this.formBuilder.control(data?.todo ?? "", {nonNullable: true, validators: [Validators.required]}),
+        completed: this.formBuilder.control(data?.completed ?? false, {nonNullable: true, validators: [Validators.required]})
       });
   }
 
@@ -71,11 +65,16 @@ export class TodoComponent {
   }
 
   public save(): void {
+    if(this.todoForm.pristine) {
+      this.dialogRef.close();
+      return;
+    }
+
     this.loading = true;
     if (!this.data){
-      <number>this.authService.id;
+      <number>this.authService.getId;
       const {todo, completed} = this.todoForm.getRawValue();
-      this.todoService.addTodo(todo, completed, <number>this.authService.id)
+      this.todoService.addTodo(todo, completed, <number>this.authService.getId)
         .pipe(catchError(() => of(null)))
         .subscribe((todo: Todo | null) => {
           this.updateData(todo);
@@ -93,14 +92,14 @@ export class TodoComponent {
 
   private updateData(todo: Todo | null): void{
     this.loading = false;
-    this.changeDetector.markForCheck();
-    if (!todo) {
-      this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
-        duration: this.durationInSecond * 1000
-      });
+    if (todo) {
+      this.dialogRef.close(todo);
       return;
     }
 
-    this.dialogRef.close(todo);
+    this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
+      duration: this.durationInSecond * 1000
+    });
+    this.changeDetector.detectChanges();
   }
 }

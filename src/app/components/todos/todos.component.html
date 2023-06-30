@@ -18,14 +18,15 @@
 </mat-card>
 <mat-card
     *ngFor="let todo of todos"
-    class="card">
+    class="card"
+    >
     <mat-card-content>
         <p>
             {{todo.todo}}
         </p>
         <mat-slide-toggle
-            [(ngModel)]="todo.completed"
-            (change)="changeStatus(todo, $event)"
+            [checked]="todo.completed"
+            (toggleChange)="changeStatus(todo)"
             >
         Completed
       </mat-slide-toggle>

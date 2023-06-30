@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Login } from '../models/login';
 import { User } from '../models/user';
-import { makeApiUrl } from '../utils/api.url.maker';
+import { makeApiUrl } from '../utils/api.url.util';
 
 @Injectable({
   providedIn: 'root'

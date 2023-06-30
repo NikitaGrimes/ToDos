@@ -59,10 +59,10 @@ export class LoginComponent {
       .pipe(catchError(() => of(null)))
       .subscribe((result: User | null) => {
         this.loading = false;
-        if (result) {
+        if (result)
           this.login(result);
-        } else this.error = true;
-        this.changeDetector.markForCheck();
+        else this.error = true;
+        this.changeDetector.detectChanges();
     })
   }
 

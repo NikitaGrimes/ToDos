@@ -5,10 +5,25 @@ import { User } from '../models/user';
   providedIn: 'root'
 })
 export class AuthenticationService {
-  public token: string | null = null;
-  public id: number | null = null;
+  private token: string | null = null;
+  private id: number | null = null;
 
-  public logout() {
+  public get getToken(): string | null {
+    return this.token
+  }
+
+  public get getId(): number | null {
+    return this.id;
+  }
+
+  constructor(){
+    this.token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    if (userId)
+      this.id = parseInt(userId);
+  }
+
+  public logOut() {
     this.token = null;
     this.id = null;
     localStorage.removeItem('token');

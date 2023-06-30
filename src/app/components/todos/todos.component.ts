@@ -14,7 +14,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { catchError, of } from 'rxjs';
 import { SpinnerComponent } from '../spinner/spinner.component';
-import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSlideToggleModule, MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -34,6 +34,9 @@ import { FormsModule } from '@angular/forms';
         SpinnerComponent,
         MatSlideToggleModule,
         FormsModule,
+    ],
+    providers:[
+        {provide: MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS , useValue: {disableToggleValue: true}}
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -57,25 +60,23 @@ export class TodosComponent implements OnInit {
 
     public ngOnInit(): void {
         this.loading = true;
-        if (this.authService.id !== null)
-            this.todoService.getUserTodos(this.authService.id)
-                .pipe(catchError(() => of(null)))
-                .subscribe((todos: Todo[] | null) => {
-                this.loading = false;
-                this.changeDetector.markForCheck();
-                if (!todos) {
-                    this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
-                    duration: this.durationInSecond * 1000
-                    });
-                    return;
-                }
+        this.todoService.getUserTodos(<number>this.authService.getId)
+            .pipe(catchError(() => of(null)))
+            .subscribe((todos: Todo[] | null) => {
+            this.loading = false;
+            if (todos) 
                 this.todos = todos;
+            else 
+                this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
+                    duration: this.durationInSecond * 1000
+                });
+            this.changeDetector.detectChanges();
             }
-        );
+        )
     }
 
     public logout(): void {
-        this.authService.logout();
+        this.authService.logOut();
         this.router.navigate(['../login'], {relativeTo: this.route});
     }
 
@@ -85,33 +86,31 @@ export class TodosComponent implements OnInit {
             if (!result) return;
             
             this.todos.push(result);
-            this.changeDetector.markForCheck();
+            this.changeDetector.detectChanges();
             this.addedTodoIds.add(result.id);
         });
     }
 
-    public changeStatus(todo: Todo, e: MatSlideToggleChange): void {
-        if (this.checkAddedTodo(todo.id, "You can't edit added todo!")) {
-            todo.completed = !todo.completed;
-            e.source.checked = todo.completed;
+    public changeStatus(todo: Todo): void {
+        if (this.checkAddedTodo(todo.id, "You can't edit added todo!"))
             return;
-        }
 
         this.loading = true;
-        this.changeDetector.markForCheck();
-        this.todoService.updateTodo(todo)
+        this.changeDetector.detectChanges();
+        const newTodo = {...todo};
+        newTodo.completed = !newTodo.completed;
+        this.todoService.updateTodo(newTodo)
             .pipe(catchError(() => of(null)))
             .subscribe((editableTodo: Todo | null) => {
                 this.loading = false;
-                this.changeDetector.markForCheck();
-                if (editableTodo) return;
+                if (editableTodo) 
+                    return this.updateTodo(editableTodo);
 
-                todo.completed = !todo.completed;
                 this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
                     duration: this.durationInSecond * 1000
                 });
             }
-        ) 
+        )
     }
 
     public edit(todo: Todo): void {
@@ -122,14 +121,17 @@ export class TodosComponent implements OnInit {
         });
       
         dialogRef.afterClosed().subscribe((editableTodo: Todo | null) => {
-            if (!editableTodo) return;
-
-            const index = this.todos.findIndex(predicateTodo => predicateTodo.id === editableTodo.id);
-            if (index !== -1)
-                this.todos[index] = editableTodo;
-
-            this.changeDetector.markForCheck();
+            if (editableTodo) 
+                this.updateTodo(editableTodo);
         });
+    }
+
+    private updateTodo(newTodo: Todo): void{
+        const index = this.todos.findIndex(predicateTodo => predicateTodo.id === newTodo.id);
+        if (index !== -1)
+            this.todos[index] = newTodo;
+
+        this.changeDetector.detectChanges();
     }
 
     public delete(id: number): void {
@@ -140,7 +142,7 @@ export class TodosComponent implements OnInit {
             if (!result) return dialogRef.close();
 
             this.loading = true;
-            this.changeDetector.markForCheck();
+            this.changeDetector.detectChanges();
             this.todoService.deleteTodo(id)
                 .pipe(catchError(() => of(null)))
                 .subscribe((todo: Todo | null) => {
@@ -156,7 +158,7 @@ export class TodosComponent implements OnInit {
                     if (index !== -1)
                         this.todos.splice(index, 1);
                     
-                    this.changeDetector.markForCheck();
+                    this.changeDetector.detectChanges();
                 }
             )
         });
