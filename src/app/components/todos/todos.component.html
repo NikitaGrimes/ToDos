@@ -7,7 +7,7 @@
     >
     LogOut
 </button>
-<mat-card
+<!-- <mat-card
     *ngIf="todos.length === 0"
     class="card">
     <mat-card-content>
@@ -15,9 +15,9 @@
             You do not have any todos.
         </p>
     </mat-card-content>
-</mat-card>
+</mat-card> -->
 <mat-card
-    *ngFor="let todo of todos"
+    *ngFor="let todo of todos$ | async"
     class="card"
     >
     <mat-card-content>
