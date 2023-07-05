@@ -73,18 +73,18 @@ export class TodoComponent {
         todo: todo, 
         completed: completed, 
         userId: <number>this.authService.getId,
-        close: this.closeDialog()
+        close: this.getCloseFunction()
       }));
     } else {
       const editableTodo: Todo = {id: this.data.id, ...this.todoForm.getRawValue(), userId: this.data.userId};
       this.store.dispatch(todoActions.updateTodo({
         todo: editableTodo, 
-        close: this.closeDialog()
+        close: this.getCloseFunction()
       }));
     }
   }
 
-  private closeDialog = () => {
+  private getCloseFunction = () => {
     const dialogRef = this.dialogRef;
     return () => dialogRef.close();
   }
