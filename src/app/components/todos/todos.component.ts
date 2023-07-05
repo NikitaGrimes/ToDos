@@ -12,11 +12,11 @@ import { MatCardModule } from '@angular/material/card';
 import { TodoComponent } from '../todo/todo.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { MatSlideToggleModule, MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
-import { select, Store, StoreModule } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { selectTodos } from 'src/app/state/todos.selectors';
 import { TodosActions } from 'src/app/state/todos.actions';
 
@@ -36,18 +36,16 @@ import { TodosActions } from 'src/app/state/todos.actions';
         MatSnackBarModule,
         SpinnerComponent,
         MatSlideToggleModule,
-        FormsModule,
-        StoreModule
+        FormsModule
     ],
     providers:[
         {provide: MAT_SLIDE_TOGGLE_DEFAULT_OPTIONS , useValue: {disableToggleValue: true}}
     ],
-    //changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TodosComponent implements OnInit {
     private addedTodoIds = new Set();
     private durationInSecond = 3;
-    public todos: Todo[] = [];
     public loading = false;
     public todos$ = this.store.select(selectTodos);
 
@@ -69,14 +67,15 @@ export class TodosComponent implements OnInit {
         this.todoService.getUserTodos(<number>this.authService.getId)
             .pipe(catchError(() => of(null)))
             .subscribe((todos: Todo[] | null) => {
-            this.loading = false;
-            if (todos)
-                this.store.dispatch(TodosActions.retrievedTodos({ todos }));
-            else 
-                this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
-                    duration: this.durationInSecond * 1000
-                });
-            this.changeDetector.detectChanges();
+                this.loading = false;
+                if (todos)
+                    this.store.dispatch(TodosActions.retrievedTodos({ todos }));
+                else {
+                    this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
+                        duration: this.durationInSecond * 1000
+                    });
+                    this.changeDetector.detectChanges();
+                }
             }
         )
     }
@@ -92,7 +91,6 @@ export class TodosComponent implements OnInit {
             if (!result) return;
 
             this.store.dispatch(TodosActions.addTodo({ todo: result }));
-            this.changeDetector.detectChanges();
             this.addedTodoIds.add(result.id);
         });
     }
@@ -114,6 +112,7 @@ export class TodosComponent implements OnInit {
                     return;
                 }
 
+                this.changeDetector.detectChanges();
                 this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
                     duration: this.durationInSecond * 1000
                     }
@@ -135,14 +134,6 @@ export class TodosComponent implements OnInit {
         });
     }
 
-    private updateTodo(newTodo: Todo): void{
-        const index = this.todos.findIndex(predicateTodo => predicateTodo.id === newTodo.id);
-        if (index !== -1)
-            this.todos[index] = newTodo;
-
-        this.changeDetector.detectChanges();
-    }
-
     public delete(id: number): void {
         if (this.checkAddedTodo(id, "You can't delete added todo!")) return;
 
@@ -160,12 +151,11 @@ export class TodosComponent implements OnInit {
                         this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
                             duration: this.durationInSecond * 1000
                         });
+                        this.changeDetector.detectChanges();
                         return;
                     }
                     
-                    this.store.dispatch(TodosActions.deleteTodo({todoId: todo.id}));
-                    
-                    this.changeDetector.detectChanges();
+                    this.store.dispatch(TodosActions.deleteTodo({ todoId: todo.id }));
                 }
             )
         });
