@@ -1,17 +1,17 @@
-import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject } from '@angular/core';
+import { CommonModule, NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { catchError, of } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectLoad } from 'src/app/state/todos.selectors';
+import * as todoActions from 'src/app/state/todos.actions';
 import { Todo } from 'src/app/models/todo';
 import { TodoForm } from 'src/app/models/todo-form';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { TodoService } from 'src/app/services/todo.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { SpinnerComponent } from '../spinner/spinner.component';
 
@@ -22,6 +22,7 @@ import { SpinnerComponent } from '../spinner/spinner.component';
   standalone: true,
   imports: [
     FormsModule, 
+    CommonModule,
     ReactiveFormsModule, 
     MatFormFieldModule, 
     MatInputModule, 
@@ -29,24 +30,20 @@ import { SpinnerComponent } from '../spinner/spinner.component';
     MatButtonModule, 
     MatSlideToggleModule,
     MatDialogModule,
-    MatSnackBarModule,
     SpinnerComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TodoComponent {
   public todoForm: FormGroup<TodoForm>;
-  public loading = false;
-  private durationInSecond = 3;
+  public isLoading$ = this.store.select(selectLoad);
 
   constructor(
     private formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<TodoComponent>,
     private dialog: MatDialog,
     private authService: AuthenticationService,
-    private todoService: TodoService,
-    private snackBar: MatSnackBar,
-    private changeDetector: ChangeDetectorRef,
+    private store: Store,
     @Inject(MAT_DIALOG_DATA) private data?: Todo
     ) {
       this.todoForm = this.formBuilder.group({
@@ -70,36 +67,25 @@ export class TodoComponent {
       return;
     }
 
-    this.loading = true;
     if (!this.data){
-      <number>this.authService.getId;
       const {todo, completed} = this.todoForm.getRawValue();
-      this.todoService.addTodo(todo, completed, <number>this.authService.getId)
-        .pipe(catchError(() => of(null)))
-        .subscribe((todo: Todo | null) => {
-          this.updateData(todo);
-        }
-      )
-    } else{
+      this.store.dispatch(todoActions.addTodo({
+        todo: todo, 
+        completed: completed, 
+        userId: <number>this.authService.getId,
+        close: this.closeDialog()
+      }));
+    } else {
       const editableTodo: Todo = {id: this.data.id, ...this.todoForm.getRawValue(), userId: this.data.userId};
-      this.todoService.updateTodo(editableTodo)
-        .pipe(catchError(() => of(null)))
-        .subscribe((todo: Todo | null) => {
-          this.updateData(todo);
-      })
+      this.store.dispatch(todoActions.updateTodo({
+        todo: editableTodo, 
+        close: this.closeDialog()
+      }));
     }
   }
 
-  private updateData(todo: Todo | null): void{
-    this.loading = false;
-    if (todo) {
-      this.dialogRef.close(todo);
-      return;
-    }
-
-    this.snackBar.open("Oops... Something's wrong. Try again.", undefined, {
-      duration: this.durationInSecond * 1000
-    });
-    this.changeDetector.detectChanges();
+  public closeDialog = () => {
+    const dialogRef = this.dialogRef;
+    return () => dialogRef.close();
   }
 }

@@ -7,12 +7,15 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { authInterceptor } from './app/services/auth.interceptor';
 import { provideStore } from '@ngrx/store';
 import { todoReducer } from './app/state/todos.reducer';
+import { provideEffects } from '@ngrx/effects';
+import { TodoEffects } from './app/state/todos.effects';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(appRoutes),
     provideAnimations(),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideStore({"todo": todoReducer})
+    provideStore({ "state": todoReducer }),
+    provideEffects(TodoEffects)
 ],
 })
