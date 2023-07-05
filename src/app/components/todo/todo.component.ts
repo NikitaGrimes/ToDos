@@ -84,7 +84,7 @@ export class TodoComponent {
     }
   }
 
-  public closeDialog = () => {
+  private closeDialog = () => {
     const dialogRef = this.dialogRef;
     return () => dialogRef.close();
   }
