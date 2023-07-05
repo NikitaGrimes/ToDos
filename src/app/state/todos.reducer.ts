@@ -2,7 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 import { Todo } from '../models/todo';
 import { TodosActions } from './todos.actions';
 
-const initialState: Todo[] = [{todo: "todo", id: 1, userId: 1, completed: true}];
+const initialState: Todo[] = [];
 
 export const todoReducer = createReducer(
     initialState,
