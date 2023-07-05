@@ -22,7 +22,7 @@ export class TodoEffects {
             mergeMap(action => 
                 this.todoService.getUserTodos(action.userId).pipe(
                     map(response =>  todoActions.getTodosSuccess({todos: response})),
-                    catchError(() => of(todoActions.getTodosFailure()))
+                    catchError(() => of(todoActions.actionFailure()))
                 )
             )
         )
@@ -37,7 +37,7 @@ export class TodoEffects {
                         action.close();
                         return todoActions.addTodoSuccess({todo: response});
                     }),
-                    catchError(() => of(todoActions.addTodoFailure()))
+                    catchError(() => of(todoActions.actionFailure()))
                 )
             )
         )
@@ -50,14 +50,14 @@ export class TodoEffects {
             mergeMap(([action, addedTodoIds]) => {
                 if (addedTodoIds.has(action.todo.id)){
                     action.close?.();
-                    return of(todoActions.updateTodoFailure());
+                    return of(todoActions.actionFailure());
                 }
                 return this.todoService.updateTodo(action.todo).pipe(
                     map(response => {
                         action.close?.();
                         return todoActions.updateTodoSuccess({todo: response});
                     }),
-                    catchError(() => of(todoActions.updateTodoFailure()))
+                    catchError(() => of(todoActions.actionFailure()))
                 )
             })
         )
@@ -69,11 +69,11 @@ export class TodoEffects {
             withLatestFrom(this.store.select(selectAddedTodoIds)),
             mergeMap(([action, addedTodoIds]) => {
                 if (addedTodoIds.has(action.todoId))
-                    return of(todoActions.updateTodoFailure());
+                    return of(todoActions.actionFailure());
 
                 return this.todoService.deleteTodo(action.todoId).pipe(
                     map(response => todoActions.deleteTodoSuccess({todoId: response.id})),
-                    catchError(() => of(todoActions.deleteTodoFailure()))
+                    catchError(() => of(todoActions.actionFailure()))
                 )
             })
         )

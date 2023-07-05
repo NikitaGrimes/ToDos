@@ -16,11 +16,6 @@ export const todoReducer = createReducer(
         isFailure: false,
         addedTodoIds: new Set()
     })),
-    on(todoActions.getTodosFailure, (state): TodosState => ({
-        ...state, 
-        isLoading: false, 
-        isFailure: true
-    })),
 
     on(todoActions.addTodo, (state): TodosState => ({
         ...state, 
@@ -32,11 +27,6 @@ export const todoReducer = createReducer(
         newState.addedTodoIds.add(result.todo.id);
         return newState;
     }),
-    on(todoActions.addTodoFailure, (state): TodosState => ({
-        ...state, 
-        isLoading: false, 
-        isFailure: true
-    })),
 
     on(todoActions.updateTodo, (state): TodosState => ({
         ...state,
@@ -51,11 +41,6 @@ export const todoReducer = createReducer(
         newState.todos[index] = result.todo;
         return newState;
     }),
-    on(todoActions.updateTodoFailure, (state): TodosState => ({
-        ...state, 
-        isLoading: false, 
-        isFailure: true
-    })),
 
     on(todoActions.deleteTodo, (state): TodosState => ({
         ...state, 
@@ -68,7 +53,8 @@ export const todoReducer = createReducer(
         isLoading: false,
         isFailure: false
     })),
-    on(todoActions.deleteTodoFailure, (state): TodosState => ({
+
+    on(todoActions.actionFailure, (state): TodosState => ({
         ...state, 
         isLoading: false, 
         isFailure: true
