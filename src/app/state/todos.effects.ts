@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { Actions, createEffect, ofType, concatLatestFrom } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
-import { catchError, mergeMap, map, of, withLatestFrom } from "rxjs";
+import { catchError, mergeMap, map, of } from "rxjs";
 import { TodoService } from "../services/todo.service";
 import * as todoActions from "./todos.actions";
 import { selectAddedTodoIds } from "./todos.selectors"
@@ -46,7 +46,7 @@ export class TodoEffects {
     updateTodo$ = createEffect(() => {
         return this.action$.pipe(
             ofType(todoActions.updateTodo),
-            withLatestFrom(this.store.select(selectAddedTodoIds)),
+            concatLatestFrom(() => this.store.select(selectAddedTodoIds)),
             mergeMap(([action, addedTodoIds]) => {
                 if (addedTodoIds.has(action.todo.id)){
                     action.close?.();
@@ -66,7 +66,7 @@ export class TodoEffects {
     deleteTodo$ = createEffect(() => {
         return this.action$.pipe(
             ofType(todoActions.deleteTodo),
-            withLatestFrom(this.store.select(selectAddedTodoIds)),
+            concatLatestFrom(() => this.store.select(selectAddedTodoIds)),
             mergeMap(([action, addedTodoIds]) => {
                 if (addedTodoIds.has(action.todoId))
                     return of(todoActions.actionFailure());
